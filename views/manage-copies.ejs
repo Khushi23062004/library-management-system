@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Copies</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>📖 Copies of: <span class="text-primary"><%= book.Title %></span></h3>
+            <a href="/books" class="btn btn-secondary">Back to Books</a>
+        </div>
+
+        <!-- Add New Copy Section -->
+        <div class="card mb-4 p-3 shadow-sm bg-white">
+            <form action="/add-copy/<%= bookId %>" method="POST" class="d-flex gap-2 align-items-end">
+                <div class="flex-grow-1">
+                    <label class="form-label fw-bold">Add New Copy (Shelf Location)</label>
+                    <input type="text" name="shelfLocation" class="form-control" placeholder="Ex: B2-Row4" required>
+                </div>
+                <button type="submit" class="btn btn-success">Add Copy</button>
+            </form>
+        </div>
+
+        <!-- List of Copies -->
+        <table class="table table-bordered bg-white shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Copy ID (Barcode)</th>
+                    <th>Status</th>
+                    <th>Shelf Location</th>
+                    <th>Purchase Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (copies.length > 0) { %>
+                    <% copies.forEach(copy => { %>
+                        <tr>
+                            <td>#<%= copy.CopyID %></td>
+                            <td>
+                                <% if(copy.Status === 'Available') { %>
+                                    <span class="badge bg-success">Available</span>
+                                <% } else if(copy.Status === 'On Loan') { %>
+                                    <span class="badge bg-warning text-dark">On Loan</span>
+                                <% } else { %>
+                                    <span class="badge bg-danger"><%= copy.Status %></span>
+                                <% } %>
+                            </td>
+                            <td><%= copy.ShelfLocation %></td>
+                            <td><%= new Date(copy.PurchaseDate).toLocaleDateString() %></td>
+                            <td>
+                                <a href="/delete-copy/<%= copy.CopyID %>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this copy?');">Delete</a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr><td colspan="5" class="text-center">No copies found.</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

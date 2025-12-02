@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
+        .card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 15px; border: none; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .dashboard-header { 
+            background: linear-gradient(135deg, #4a90e2 0%, #002c6d 100%); 
+            color: white; 
+            padding: 40px 0 80px; /* Extra padding bottom for overlap effect */
+            margin-bottom: 0; 
+            border-radius: 0 0 30px 30px;
+        }
+        .stats-card-body { padding: 1.5rem; }
+        .icon-box { 
+            width: 60px; height: 60px; 
+            border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.8rem; margin-bottom: 15px;
+        }
+        .container { flex: 1; margin-top: -50px; } /* Overlap effect */
+        footer { background: #343a40; color: #adb5bd; padding: 20px 0; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section (Search bar removed) -->
+    <div class="dashboard-header text-center">
+        <div class="container-fluid">
+            <h1 class="fw-bold"><i class="bi bi-book-half"></i> Public Library System</h1>
+            <p class="lead opacity-75">Admin Dashboard & Management Portal</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <!-- Dashboard Stats Cards -->
+        <div class="row g-4">
+            
+            <!-- Card 1: Books -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body stats-card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Total Books</p>
+                                <h2 class="fw-bold mb-0"><%= counts.books %></h2>
+                            </div>
+                            <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-journal-bookmark-fill"></i>
+                            </div>
+                        </div>
+                        <a href="/books" class="btn btn-sm btn-outline-primary mt-3 w-100">Manage Books</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Members -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body stats-card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Total Members</p>
+                                <h2 class="fw-bold mb-0"><%= counts.members %></h2>
+                            </div>
+                            <div class="icon-box bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                        <a href="/members" class="btn btn-sm btn-outline-success mt-3 w-100">Manage Members</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Active Loans -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body stats-card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Active Loans</p>
+                                <h2 class="fw-bold mb-0"><%= counts.activeLoans %></h2>
+                            </div>
+                            <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </div>
+                        </div>
+                        <a href="/transactions" class="btn btn-sm btn-outline-warning mt-3 w-100">Issue / Return</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Pending Fines -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body stats-card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Unpaid Fines</p>
+                                <h2 class="fw-bold mb-0 text-danger">₹<%= counts.pendingFines %></h2>
+                            </div>
+                            <div class="icon-box bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                        </div>
+                        <a href="/fines" class="btn btn-sm btn-outline-danger mt-3 w-100">Check Fines</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history"></i> Recent Activity</h5>
+                        <a href="/transactions" class="btn btn-sm btn-light">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Member</th>
+                                    <th>Book</th>
+                                    <th>Action</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (recentTransactions.length > 0) { %>
+                                    <% recentTransactions.forEach(txn => { %>
+                                        <tr>
+                                            <td>#<%= txn.TransactionID %></td>
+                                            <td><%= txn.MemberName %></td>
+                                            <td><%= txn.Title %></td>
+                                            <td>
+                                                <% if(txn.ReturnDate) { %>
+                                                    <span class="badge bg-success bg-opacity-10 text-success">Returned</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-warning bg-opacity-10 text-warning">Issued</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-muted small">
+                                                <%= txn.ReturnDate ? new Date(txn.ReturnDate).toLocaleDateString() : new Date(txn.IssueDate).toLocaleDateString() %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center py-3 text-muted">No recent activity.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Public Library Management System. Developed by <strong>Lucky</strong>.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

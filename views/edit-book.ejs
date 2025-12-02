@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card shadow col-md-8 mx-auto">
+            <div class="card-header bg-warning">
+                <h4 class="mb-0">Edit Book Details</h4>
+            </div>
+            <div class="card-body">
+                <form action="/edit-book/<%= book.BookID %>" method="POST">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Book Title</label>
+                        <input type="text" name="title" class="form-control" value="<%= book.Title %>" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">ISBN</label>
+                        <input type="text" name="isbn" class="form-control" value="<%= book.ISBN %>" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Publication Date</label>
+                        <input type="date" name="pubDate" class="form-control" value="<%= book.PublicationDate %>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Category (Cannot be edited directly)</label>
+                        <input type="text" class="form-control" value="<%= book.CategoryName %>" disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Publisher (Cannot be edited directly)</label>
+                        <input type="text" class="form-control" value="<%= book.PublisherName %>" disabled>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">Update Book</button>
+                    <a href="/books" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
