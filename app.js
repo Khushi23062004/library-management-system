@@ -10,26 +10,51 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// --- 2. DATABASE CONNECTION (UPDATED FOR DEPLOYMENT!) ---
-// Production mein credentials environment variables (process.env) se aate hain.
-const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost', // Localhost default (agar DB_HOST set nahi hai)
-    user: process.env.DB_USER || 'root', 
-    password: process.env.DB_PASSWORD || '', 
-    database: process.env.DB_NAME || 'library_system',
-    port: process.env.DB_PORT || 3306, // Default MySQL port
-    multipleStatements: true 
-});
+// --- 2. DATABASE CONNECTION (RESILIENT RETRY LOOP ADDED) ---
+let db;
 
-db.connect((err) => {
-    if (err) {
-        console.error('❌ Database connection failed: ' + err.stack);
-        return;
-    }
-    console.log('✅ Success! Connected to MySQL Database (library_system).');
-});
+// Function jo connection ko handle aur retry karega
+function handleConnection() {
+    db = mysql.createConnection({
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root', 
+        password: process.env.DB_PASSWORD || '', 
+        database: process.env.DB_NAME || 'library_system',
+        port: process.env.DB_PORT || 3306,
+        multipleStatements: true 
+    });
 
-// --- 3. ROUTES ---
+    db.connect((err) => {
+        if (err) {
+            // Connection failed, 5 seconds baad dobara try karo
+            console.error(`❌ DB Connection Failed: ${err.code}. Retrying in 5s...`);
+            setTimeout(handleConnection, 5000); 
+            return;
+        }
+        
+        console.log('✅ Success! Connected to MySQL Database (library_system).');
+        
+        // Agar connection ban gaya, to Server chalu karo
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    });
+
+    // Connection error handler (agar beech mein connection toot jaye)
+    db.on('error', function(err) {
+        if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNREFUSED' || err.fatal) {
+            console.error('⚠️ Database connection lost. Attempting to re-establish...');
+            handleConnection(); // Wapas connection loop shuru karo
+        } else {
+            throw err;
+        }
+    });
+}
+
+// Server chalu karne ka process ab yahan se shuru hoga
+handleConnection(); 
+
+
+// --- 3. ROUTES (No Change in logic, just moved outside the connection block) ---
 
 // ==========================
 //      A. DASHBOARD (HOME)
@@ -57,7 +82,8 @@ app.get('/', (req, res) => {
     db.query(sql, (err, results) => {
         if (err) {
             console.error("Dashboard Error:", err);
-            return res.send("Error loading dashboard data.");
+            // Error ke time ek simple page bhej do
+            return res.send("<h1 style='color:red;'>Database Error: Please check your connection or wait for the retry loop.</h1>");
         }
 
         const stats = {
@@ -397,6 +423,3 @@ app.get('/pay-fine/:id', (req, res) => {
         res.redirect('/fines');
     });
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
